@@ -1,0 +1,64 @@
+/* Shared look for every cabinet in 노을 오락실: one full-height stage holding a fixed-ratio canvas, menus laid over it as low-anchored briefing cards. Single dusk theme by choice. */
+:root{
+  --dusk:#1b1530;
+  --plum:#3a2550;
+  --coral:#f08a5d;
+  --brass:#f5c45e;
+  --cream:#f6ead7;
+  --mist:#b9adc8;
+  --ink:#120d22;
+  --sea:#6fd0a8;
+  --f-display:"Black Han Sans","IBM Plex Sans KR",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans KR",system-ui,sans-serif;
+  --f-num:"Chakra Petch","IBM Plex Sans KR",ui-monospace,monospace;
+  color-scheme:dark;
+}
+[hidden]{display:none!important}
+*,*::before,*::after{box-sizing:border-box}
+html,body{height:100%}
+html{background:var(--dusk)}
+body{
+  margin:0;background:var(--dusk);color:var(--cream);font-family:var(--f-body);
+  overflow:hidden;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-block:env(safe-area-inset-top,0px) env(safe-area-inset-bottom,0px);
+}
+html.embedded body{padding-left:0;padding-right:0}
+#stage{height:100%;display:grid;place-items:center}
+#frame{position:relative;user-select:none;-webkit-user-select:none;touch-action:none;box-shadow:0 0 0 1px rgba(245,196,94,.18),0 30px 80px rgba(0,0,0,.45);max-width:100%;overflow:hidden}
+#game{display:block;width:100%;height:100%;touch-action:none}
+.panel{
+  position:absolute;inset:0;display:flex;flex-direction:column;justify-content:flex-end;gap:16px;
+  padding:28px 26px 36px;
+  background:linear-gradient(to bottom,rgba(27,21,48,.1) 0%,rgba(27,21,48,.6) 42%,rgba(18,13,34,.94) 100%);
+}
+.eyebrow{font-family:var(--f-num);font-weight:700;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--coral);margin:0}
+.panel h1,.panel h2{font-family:var(--f-display);font-weight:400;margin:0;line-height:1.02;text-wrap:balance}
+.panel h1{font-size:clamp(42px,11vmin,74px);color:var(--cream);text-shadow:0 4px 0 var(--coral)}
+.panel h2{font-size:clamp(32px,8vmin,50px)}
+.lede{margin:0;max-width:32ch;line-height:1.6;color:var(--mist);font-size:15px}
+.keys{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;margin:0;font-size:13px;color:var(--mist)}
+.keys dt{font-family:var(--f-num);font-weight:700;color:var(--cream);letter-spacing:.04em}
+.keys dd{margin:0}
+.row{display:flex;flex-wrap:wrap;align-items:center;gap:16px}
+.btn{
+  font-family:var(--f-display);font-size:22px;letter-spacing:.04em;
+  background:var(--brass);color:var(--ink);border:0;border-radius:3px;padding:12px 30px;cursor:pointer;
+  box-shadow:0 4px 0 #b9862a;transition:transform .08s ease,box-shadow .08s ease;
+}
+.btn:hover{transform:translateY(-1px);box-shadow:0 5px 0 #b9862a}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 #b9862a}
+.btn:focus-visible,.hud-btn:focus-visible{outline:2px solid var(--cream);outline-offset:3px}
+.best{font-family:var(--f-num);font-size:14px;color:var(--mist);font-variant-numeric:tabular-nums}
+.best b{color:var(--brass);font-weight:700}
+.big-score{font-family:var(--f-num);font-weight:700;font-size:44px;color:var(--brass);font-variant-numeric:tabular-nums;margin:0;line-height:1}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12px;color:var(--mist);margin:0;padding:0;list-style:none}
+.legend span{display:inline-grid;place-items:center;width:18px;height:18px;border-radius:50%;font-family:var(--f-num);font-weight:700;font-size:11px;color:var(--ink);margin-right:5px;vertical-align:-4px}
+.hud-btn{
+  position:absolute;font-family:var(--f-body);font-size:12px;font-weight:600;color:var(--cream);
+  background:rgba(18,13,34,.5);border:1px solid rgba(246,234,215,.25);border-radius:3px;padding:5px 9px;cursor:pointer;
+}
+#pauseBtn{top:52px;right:12px}
+#muteBtn{top:52px;right:76px}
+@media (prefers-reduced-motion:reduce){.btn{transition:none}}

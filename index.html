@@ -1,0 +1,312 @@
+<title>노을 오락실</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Chakra+Petch:wght@500;700&family=IBM+Plex+Sans+KR:wght@400;600&display=swap">
+<style>
+/* Layout: a seaside arcade hall at dusk. Header like a painted shop sign, then a cabinet wall: the flagship shooter spans two bays, four smaller cabinets fill the rest. A game opens over the hall in its own full-height bay. Single dusk theme by choice, matching the cabinets. */
+:root{
+  --dusk:#1b1530;
+  --plum:#3a2550;
+  --coral:#f08a5d;
+  --brass:#f5c45e;
+  --cream:#f6ead7;
+  --mist:#b9adc8;
+  --ink:#120d22;
+  --sea:#6fd0a8;
+  --line:rgba(246,234,215,.14);
+  --f-display:"Black Han Sans","IBM Plex Sans KR",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans KR",system-ui,sans-serif;
+  --f-num:"Chakra Petch","IBM Plex Sans KR",ui-monospace,monospace;
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{background:var(--dusk)}
+body{
+  margin:0;min-height:100%;background:var(--dusk);color:var(--cream);font-family:var(--f-body);font-size:15px;line-height:1.55;
+  background-image:radial-gradient(120% 60% at 70% 0%,rgba(240,138,93,.22),rgba(240,138,93,0) 60%),linear-gradient(to bottom,#2a1d44 0,var(--dusk) 420px);
+  background-repeat:no-repeat;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-block:0;
+}
+body.playing{overflow:hidden}
+.hall{max-width:1080px;margin:0 auto;padding-block:40px 56px;display:flex;flex-direction:column;gap:32px}
+header{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px 32px}
+.sign{display:flex;flex-direction:column;gap:10px;min-width:0}
+.eyebrow{font-family:var(--f-num);font-weight:700;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--coral);margin:0}
+h1{font-family:var(--f-display);font-weight:400;font-size:clamp(48px,9vw,92px);line-height:.95;margin:0;color:var(--cream);text-shadow:0 5px 0 var(--coral);text-wrap:balance}
+.lede{margin:0;max-width:44ch;color:var(--mist)}
+.hours{font-family:var(--f-num);font-size:13px;color:var(--mist);border:1px solid var(--line);padding:10px 14px;border-radius:3px;display:grid;grid-template-columns:auto auto;gap:2px 16px;font-variant-numeric:tabular-nums}
+.hours b{color:var(--brass);font-weight:700}
+
+.wall{display:grid;grid-template-columns:1fr;gap:20px}
+@media (min-width:640px){.wall{grid-template-columns:repeat(2,minmax(0,1fr))}.feature{grid-column:span 2}}
+@media (min-width:980px){.wall{grid-template-columns:repeat(3,minmax(0,1fr))}}
+
+.cab{
+  display:flex;flex-direction:column;min-width:0;text-decoration:none;color:inherit;
+  background:linear-gradient(to bottom,#2b1f45,#221838);border:1px solid var(--line);border-radius:3px;overflow:hidden;
+  transition:transform .14s ease,border-color .14s ease,box-shadow .14s ease;
+}
+.cab:hover{transform:translateY(-3px);border-color:rgba(245,196,94,.5);box-shadow:0 18px 40px rgba(0,0,0,.35)}
+.cab:focus-visible{outline:2px solid var(--brass);outline-offset:3px}
+.screen{position:relative;aspect-ratio:16/10;max-width:100%;background:var(--ink);border-bottom:1px solid var(--line)}
+.screen svg{display:block;width:100%;height:100%}
+.screen::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(to bottom,rgba(0,0,0,0) 0 3px,rgba(0,0,0,.12) 3px 4px);pointer-events:none}
+.info{display:flex;flex-direction:column;gap:8px;padding:16px 18px 18px;flex:1}
+.genre{font-family:var(--f-num);font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--coral);margin:0}
+.cab h2{font-family:var(--f-display);font-weight:400;font-size:28px;line-height:1.05;margin:0;text-wrap:balance}
+.desc{margin:0;color:var(--mist);font-size:14px}
+.foot{margin-top:auto;padding-top:10px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 12px;border-top:1px dashed var(--line)}
+.ctrl{font-size:12px;color:var(--mist)}
+.best{font-family:var(--f-num);font-size:13px;color:var(--mist);font-variant-numeric:tabular-nums}
+.best b{color:var(--brass);font-weight:700}
+.play{font-family:var(--f-display);font-size:17px;background:var(--brass);color:var(--ink);border-radius:3px;padding:6px 16px;box-shadow:0 3px 0 #b9862a}
+@media (min-width:640px){
+  .feature{flex-direction:row}
+  .feature .screen{flex:1.35;aspect-ratio:auto;min-height:280px;border-bottom:0;border-right:1px solid var(--line)}
+  .feature .info{flex:1;padding:22px 24px}
+  .feature h2{font-size:40px}
+}
+.note{margin:0;font-size:13px;color:var(--mist);max-width:70ch}
+
+#player{
+  position:fixed;inset:0;z-index:20;background:var(--dusk);display:flex;flex-direction:column;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+}
+#player[hidden]{display:none}
+.bar{display:flex;align-items:center;gap:14px;min-height:52px;flex-wrap:wrap;padding-block:6px}
+#backBtn{
+  font-family:var(--f-body);font-weight:600;font-size:14px;color:var(--cream);background:rgba(246,234,215,.08);
+  border:1px solid var(--line);border-radius:3px;padding:7px 14px;cursor:pointer;
+}
+#backBtn:hover{background:rgba(246,234,215,.14)}
+#backBtn:focus-visible{outline:2px solid var(--brass);outline-offset:2px}
+#playTitle{font-family:var(--f-display);font-weight:400;font-size:22px;margin:0}
+.hint{margin-left:auto;font-size:12px;color:var(--mist)}
+#playFrame{flex:1;width:100%;min-height:0;border:0;display:block;background:var(--dusk)}
+@media (max-width:520px){.hint{display:none}}
+@media (prefers-reduced-motion:reduce){.cab{transition:none}.cab:hover{transform:none}}
+</style>
+
+<main class="hall">
+  <header>
+    <div class="sign">
+      <p class="eyebrow">남쪽 군도 선착장 2층</p>
+      <h1>노을 오락실</h1>
+      <p class="lede">해 질 녘 바닷가 오락실에 게임기 다섯 대가 켜져 있습니다. 하나를 골라 바로 시작하세요. 키보드, 마우스, 터치 모두 됩니다.</p>
+    </div>
+    <div class="hours" aria-label="오락실 안내">
+      <span>게임기</span><b>5대</b>
+      <span>기록 보관</span><b>이 브라우저</b>
+    </div>
+  </header>
+
+  <section class="wall" aria-label="게임 목록">
+    <a class="cab feature" href="#squadron">
+      <div class="screen">
+        <svg viewBox="0 0 160 100" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+          <defs><linearGradient id="sqSea" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#123650"/><stop offset="1" stop-color="#1d5a70"/></linearGradient></defs>
+          <rect width="160" height="100" fill="url(#sqSea)"/>
+          <g stroke="rgba(255,214,180,.25)" stroke-width="1"><path d="M10 20h8M70 12h10M120 30h7M30 50h9M130 70h10M90 88h8"/></g>
+          <ellipse cx="34" cy="76" rx="24" ry="13" fill="#e2c995"/><ellipse cx="34" cy="76" rx="20" ry="10" fill="#4c8257"/><circle cx="30" cy="74" r="3" fill="#2f573c"/><circle cx="40" cy="78" r="2.5" fill="#2f573c"/>
+          <g fill="rgba(255,240,228,.85)"><circle cx="128" cy="44" r="9"/><circle cx="138" cy="46" r="7"/><circle cx="119" cy="47" r="6"/></g>
+          <g fill="#a8423f"><g transform="translate(60 24) rotate(180)"><path d="M-11 1-3-3h6l8 4-1 3h-20z"/><ellipse rx="2.6" ry="9"/></g><g transform="translate(96 20) rotate(180)"><path d="M-11 1-3-3h6l8 4-1 3h-20z"/><ellipse rx="2.6" ry="9"/></g></g>
+          <g fill="#3b365e"><g transform="translate(78 36) rotate(180)"><path d="M-14 1-3-4h6l11 5-1 3h-26z"/><ellipse rx="3.4" ry="11"/></g></g>
+          <g fill="#ffe2c8" stroke="#e0414f" stroke-width="1.2"><circle cx="70" cy="50" r="2"/><circle cx="84" cy="54" r="2"/><circle cx="64" cy="60" r="2"/><circle cx="92" cy="46" r="2"/></g>
+          <g fill="#f5c45e"><rect x="78" y="56" width="1.6" height="6"/><rect x="82" y="50" width="1.6" height="6"/><rect x="78" y="44" width="1.6" height="6"/></g>
+          <g transform="translate(80 78)" fill="#f6ead7"><path d="M-15 2-4-4h8l11 6-1 3h-28z"/><ellipse rx="3.8" ry="12"/><path d="M-6 9h12v3h-12z"/><ellipse cy="-4" rx="1.8" ry="3" fill="#1f6f7a"/></g>
+          <rect width="160" height="100" fill="rgba(240,138,93,.14)"/>
+        </svg>
+      </div>
+      <div class="info">
+        <p class="genre">종스크롤 비행 슈팅</p>
+        <h2>노을 편대</h2>
+        <p class="desc">해 지는 바다 위로 몰려오는 적 편대를 정찰기 한 대로 막습니다. 다섯 번째 파마다 적 기함 흑운호가 나타나고, 화력·수리·폭탄 아이템으로 버팁니다.</p>
+        <div class="foot">
+          <span class="ctrl">방향키 · 화면 끌기 · 폭탄 X</span>
+          <span class="best" data-best="squadron">아직 기록 없음</span>
+          <span class="play">출격</span>
+        </div>
+      </div>
+    </a>
+
+    <a class="cab" href="#bricks">
+      <div class="screen">
+        <svg viewBox="0 0 160 100" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+          <defs><linearGradient id="brSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1b1530"/><stop offset=".6" stop-color="#3a2550"/><stop offset="1" stop-color="#c4624f"/></linearGradient></defs>
+          <rect width="160" height="100" fill="url(#brSky)"/>
+          <circle cx="80" cy="96" r="26" fill="rgba(245,160,90,.5)"/>
+          <g fill="#d0527a"><rect x="14" y="14" width="20" height="7" rx="1"/><rect x="37" y="14" width="20" height="7" rx="1"/><rect x="60" y="14" width="20" height="7" rx="1"/><rect x="83" y="14" width="20" height="7" rx="1"/><rect x="106" y="14" width="20" height="7" rx="1"/><rect x="129" y="14" width="20" height="7" rx="1"/></g>
+          <g fill="#f08a5d"><rect x="14" y="24" width="20" height="7" rx="1"/><rect x="37" y="24" width="20" height="7" rx="1"/><rect x="83" y="24" width="20" height="7" rx="1"/><rect x="106" y="24" width="20" height="7" rx="1"/><rect x="129" y="24" width="20" height="7" rx="1"/></g>
+          <g fill="#f5c45e"><rect x="14" y="34" width="20" height="7" rx="1"/><rect x="60" y="34" width="20" height="7" rx="1"/><rect x="83" y="34" width="20" height="7" rx="1"/><rect x="129" y="34" width="20" height="7" rx="1"/></g>
+          <g fill="#59627a"><rect x="37" y="44" width="20" height="7" rx="1"/><rect x="106" y="44" width="20" height="7" rx="1"/></g>
+          <g fill="#f5c45e" opacity=".5"><rect x="66" y="40" width="4" height="3"/><rect x="72" y="45" width="3" height="3"/></g>
+          <circle cx="74" cy="62" r="3.4" fill="#fff6e6"/><circle cx="70" cy="66" r="2.4" fill="rgba(245,196,94,.35)"/>
+          <rect x="62" y="84" width="38" height="5" rx="2" fill="#d9a35a"/>
+        </svg>
+      </div>
+      <div class="info">
+        <p class="genre">벽돌깨기</p>
+        <h2>노을 벽돌깨기</h2>
+        <p class="desc">판자로 공을 튕겨 여섯 가지 벽돌 배치를 깹니다. 단계가 오를수록 벽돌이 단단해지고 공이 빨라집니다.</p>
+        <div class="foot">
+          <span class="ctrl">마우스 · 탭 · 방향키</span>
+          <span class="best" data-best="bricks">아직 기록 없음</span>
+          <span class="play">시작</span>
+        </div>
+      </div>
+    </a>
+
+    <a class="cab" href="#eel">
+      <div class="screen">
+        <svg viewBox="0 0 160 100" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+          <defs><linearGradient id="eelSea" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2c4f6b"/><stop offset="1" stop-color="#0d1a2e"/></linearGradient></defs>
+          <rect width="160" height="100" fill="url(#eelSea)"/>
+          <g fill="rgba(240,138,93,.08)"><path d="M30 0h16l30 100H50z"/><path d="M100 0h14l26 100h-24z"/></g>
+          <g stroke="rgba(80,150,110,.6)" stroke-width="3" stroke-linecap="round" fill="none"><path d="M14 100c3-10-3-18 1-30"/><path d="M146 100c-4-12 3-20-1-34"/></g>
+          <path d="M26 78C44 78 44 50 66 50S88 72 106 66 118 40 124 36" fill="none" stroke="#a8504a" stroke-width="7" stroke-linecap="round"/>
+          <path d="M66 50C80 50 88 72 106 66S118 40 124 36" fill="none" stroke="#e08455" stroke-width="9" stroke-linecap="round"/>
+          <circle cx="125" cy="35" r="7" fill="#f5b45e"/><circle cx="127" cy="32" r="2.2" fill="#fff6e6"/><circle cx="128" cy="32" r="1.1" fill="#120d22"/>
+          <g transform="translate(140 22)"><path d="M4 0 9-4v8z" fill="#f08a5d"/><ellipse rx="6" ry="4" fill="#f08a5d"/><circle cx="-3" cy="-1" r="1" fill="#120d22"/></g>
+          <g fill="#3f4760"><path d="M40 30l4-5 6 1 2 6-5 3-6-1z"/><path d="M96 86l3-5 7 0 2 5-4 4-7-1z"/></g>
+          <g fill="rgba(214,234,240,.35)"><circle cx="60" cy="20" r="1.6"/><circle cx="64" cy="12" r="1"/><circle cx="110" cy="16" r="1.4"/></g>
+        </svg>
+      </div>
+      <div class="info">
+        <p class="genre">꼬리 늘리기</p>
+        <h2>바다 뱀장어</h2>
+        <p class="desc">물고기를 먹을수록 길어지고 빨라지는 뱀장어입니다. 바위가 하나씩 늘어나는 바위틈을 벽과 꼬리를 피해 헤엄칩니다.</p>
+        <div class="foot">
+          <span class="ctrl">방향키 · 화면 밀기</span>
+          <span class="best" data-best="eel">아직 기록 없음</span>
+          <span class="play">시작</span>
+        </div>
+      </div>
+    </a>
+
+    <a class="cab" href="#crab">
+      <div class="screen">
+        <svg viewBox="0 0 160 100" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+          <defs><linearGradient id="crSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#48346e"/><stop offset=".7" stop-color="#e88060"/><stop offset="1" stop-color="#fac478"/></linearGradient></defs>
+          <rect width="160" height="100" fill="url(#crSky)"/>
+          <circle cx="112" cy="58" r="14" fill="#fcd68c"/>
+          <path d="M0 64c20-8 40-8 60 0V66H0z" fill="#784670"/>
+          <rect y="64" width="160" height="12" fill="#5a4682"/>
+          <g stroke="rgba(252,214,140,.6)" stroke-width="1.2"><path d="M20 68h8M70 70h10M120 68h9M100 73h6"/></g>
+          <rect y="76" width="160" height="24" fill="#e2b884"/><rect y="76" width="160" height="2" fill="#f6dcaa"/>
+          <path d="M104 77l2-10 6-4 7 2 3 12z" fill="#5c526e"/>
+          <g transform="translate(46 66)">
+            <g stroke="#b8402e" stroke-width="1.6" stroke-linecap="round" fill="none"><path d="M-6 3-11 1-13 6M-3 4-8 3-9 8M6 3 11 1 13 6M3 4 8 3 9 8"/><path d="M-4-3-6-8M4-3 6-8"/></g>
+            <ellipse cy="0" rx="10" ry="6" fill="#e0553c"/>
+            <ellipse cx="-14" cy="-8" rx="3.6" ry="3" fill="#e0553c"/><ellipse cx="14" cy="-8" rx="3.6" ry="3" fill="#e0553c"/>
+            <circle cx="-6" cy="-9" r="1.8" fill="#fff6e6"/><circle cx="6" cy="-9" r="1.8" fill="#fff6e6"/>
+          </g>
+          <g fill="none" stroke="#f6ead7" stroke-width="3" stroke-linecap="round"><path d="M70 30q5-3 10 0 5-3 10 0"/></g>
+          <path d="M136 82q4-8 8 0z" fill="#f6ead7"/>
+        </svg>
+      </div>
+      <div class="info">
+        <p class="genre">한 버튼 달리기</p>
+        <h2>꽃게 질주</h2>
+        <p class="desc">밀물이 오기 전 모래사장을 달리는 꽃게입니다. 바위와 유목을 뛰어넘고 조개를 모읍니다. 해가 지고 밤이 올수록 빨라집니다.</p>
+        <div class="foot">
+          <span class="ctrl">스페이스 · 탭 · 2단 점프</span>
+          <span class="best" data-best="crab">아직 기록 없음</span>
+          <span class="play">시작</span>
+        </div>
+      </div>
+    </a>
+
+    <a class="cab" href="#mudskipper">
+      <div class="screen">
+        <svg viewBox="0 0 160 100" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+          <defs><linearGradient id="mdSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a2550"/><stop offset="1" stop-color="#f5b06a"/></linearGradient></defs>
+          <rect width="160" height="30" fill="url(#mdSky)"/>
+          <path d="M98 30a12 12 0 0 1 24 0z" fill="#fcd68c"/>
+          <rect y="29" width="160" height="5" fill="#4b3a66"/>
+          <rect y="34" width="160" height="66" fill="#5e4049"/>
+          <ellipse cx="40" cy="44" rx="20" ry="2.5" fill="rgba(240,138,93,.2)"/>
+          <g><ellipse cx="32" cy="80" rx="18" ry="6" fill="#7a5a60"/><ellipse cx="32" cy="79" rx="14" ry="4" fill="#21151f"/></g>
+          <g><ellipse cx="128" cy="80" rx="18" ry="6" fill="#7a5a60"/><ellipse cx="128" cy="79" rx="14" ry="4" fill="#21151f"/></g>
+          <g><ellipse cx="80" cy="68" rx="18" ry="6" fill="#7a5a60"/><ellipse cx="80" cy="67" rx="14" ry="4" fill="#21151f"/></g>
+          <path d="M70 67V56a10 10 0 0 1 20 0v11z" fill="#9c7a62"/>
+          <circle cx="76" cy="50" r="4" fill="#9c7a62"/><circle cx="84" cy="50" r="4" fill="#9c7a62"/>
+          <circle cx="76" cy="49.5" r="3" fill="#fff6e6"/><circle cx="84" cy="49.5" r="3" fill="#fff6e6"/>
+          <circle cx="76.6" cy="50" r="1.4" fill="#120d22"/><circle cx="84.6" cy="50" r="1.4" fill="#120d22"/>
+          <path d="M76 58q4 3 8 0" fill="none" stroke="#4a3328" stroke-width="1"/>
+          <ellipse cx="80" cy="69" rx="18" ry="3" fill="#5e4049"/>
+          <g transform="translate(118 50) rotate(30)"><rect x="-2" y="0" width="4" height="22" fill="#8a5a2b"/><rect x="-10" y="-8" width="20" height="9" fill="#d9a35a"/></g>
+        </svg>
+      </div>
+      <div class="info">
+        <p class="genre">45초 두드리기</p>
+        <h2>갯벌 망둥어 잡기</h2>
+        <p class="desc">물 빠진 갯벌 구멍에서 튀어나오는 망둥어를 잡습니다. 연속으로 잡으면 점수가 배로 늘고, 복어를 치면 깎입니다.</p>
+        <div class="foot">
+          <span class="ctrl">클릭 · 탭 · 숫자패드</span>
+          <span class="best" data-best="mudskipper">아직 기록 없음</span>
+          <span class="play">시작</span>
+        </div>
+      </div>
+    </a>
+  </section>
+
+  <p class="note">최고 기록은 지금 쓰는 브라우저에만 저장되고, 다른 기기나 다른 사람과는 공유되지 않습니다. 게임 중 Esc나 P를 누르면 멈추고, M으로 소리를 끄고 켭니다.</p>
+</main>
+
+<div id="player" hidden>
+  <div class="bar">
+    <button id="backBtn" type="button">← 오락실로</button>
+    <p id="playTitle">게임</p>
+    <span class="hint">Esc 일시정지 · M 소리</span>
+  </div>
+  <iframe id="playFrame" title="게임 화면" src="about:blank" allow="autoplay"></iframe>
+</div>
+
+<script>
+(() => {
+'use strict';
+const GAMES = {
+  squadron: { file: 'squadron.html', name: '노을 편대', key: 'noeul-hi' },
+  bricks: { file: 'bricks.html', name: '노을 벽돌깨기', key: 'arcade-bricks-hi' },
+  eel: { file: 'eel.html', name: '바다 뱀장어', key: 'arcade-eel-hi' },
+  crab: { file: 'crab.html', name: '꽃게 질주', key: 'arcade-crab-hi' },
+  mudskipper: { file: 'mudskipper.html', name: '갯벌 망둥어 잡기', key: 'arcade-mud-hi' }
+};
+const $ = id => document.getElementById(id);
+const player = $('player'), frame = $('playFrame'), title = $('playTitle');
+
+function readBest(key) {
+  try { const v = localStorage.getItem(key); return v == null ? 0 : Number(JSON.parse(v)) || 0; } catch (e) { return 0; }
+}
+function renderBests() {
+  document.querySelectorAll('[data-best]').forEach(el => {
+    const g = GAMES[el.dataset.best], v = g ? readBest(g.key) : 0;
+    el.innerHTML = v > 0 ? `최고 <b>${v.toLocaleString('ko-KR')}</b>` : '아직 기록 없음';
+  });
+}
+function openGame(id) {
+  const g = GAMES[id];
+  title.textContent = g.name;
+  if (frame.dataset.id !== id) { frame.dataset.id = id; frame.src = g.file; }
+  player.hidden = false; document.body.classList.add('playing');
+  $('backBtn').focus({ preventScroll: true });
+}
+function closeGame() {
+  if (player.hidden) return;
+  player.hidden = true; document.body.classList.remove('playing');
+  frame.src = 'about:blank'; frame.dataset.id = '';
+  renderBests();
+}
+frame.addEventListener('load', () => { if (frame.dataset.id) { try { frame.contentWindow.focus(); } catch (e) {} } });
+function route() {
+  const id = location.hash.slice(1);
+  if (GAMES[id]) openGame(id); else closeGame();
+}
+$('backBtn').addEventListener('click', () => { if (location.hash) location.hash = ''; else closeGame(); });
+addEventListener('hashchange', route);
+addEventListener('storage', renderBests);
+renderBests(); route();
+})();
+</script>
